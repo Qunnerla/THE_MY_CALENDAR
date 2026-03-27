@@ -86,7 +86,7 @@ for (let m = 0; m < 12; m++) {
         noteClass = "note-red";
         taskNotesContent = `
             <li style="list-style-type: none; margin-left: -20px; font-weight: bold; color: #d32f2f;">⏰ 07:00 - 19:00</li>
-            <li style="margin-bottom: 8px;">นั่งขายของช่วยแม่ (เต็มวัน)</li>
+            <li style="margin-bottom: 8px;">ดูแลหน้าร้าน / ช่วยงานที่บ้าน (เต็มวัน)</li>
             <li style="list-style-type: none; margin-left: -20px; font-weight: bold; color: #1976d2;">💻 19:00 - 00:00</li>
             <li>เวลาทำงานหลัก (แอนิเมชัน / โปรเจกต์)</li>
         `;
@@ -241,6 +241,10 @@ container.addEventListener('click', function(e) {
 // กดกากบาทปิด Popup
 closeModal.addEventListener('click', () => { modal.classList.remove('show'); });
 
+// กดพื้นที่สีดำด้านนอกเพื่อปิด Popup
+window.addEventListener('click', (e) => {
+    if (e.target === modal) { modal.classList.remove('show'); }
+});
 // กดพื้นที่สีดำด้านนอกเพื่อปิด Popup
 window.addEventListener('click', (e) => {
     if (e.target === modal) { modal.classList.remove('show'); }
