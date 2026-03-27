@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="calendar-container" id="calendar-container">
+        </div>
+
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2 id="modal-date" class="modal-title">วันที่</h2>
+            <div id="modal-events" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

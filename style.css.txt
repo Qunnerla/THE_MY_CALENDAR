@@ -1,0 +1,158 @@
+/* ล้างค่าเริ่มต้น */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body, html { height: 100%; overflow: hidden; background-color: #1a1a1a; }
+
+/* =========================================================
+   💻 โหมดคอมพิวเตอร์ (Desktop)
+========================================================= */
+.calendar-container {
+    height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth;
+}
+
+.month-section {
+    height: 100vh; 
+    scroll-snap-align: start; display: flex; flex-direction: column;
+    align-items: center; padding: 2vh 20px; background-color: #f8f9fa;
+    overflow: hidden; 
+}
+
+/* ส่วนหัวปฏิทิน */
+.month-header { 
+    display: flex; justify-content: flex-start; align-items: center; 
+    margin-bottom: 1.5vh; width: 100%; max-width: 1300px; flex-shrink: 0;
+    border-bottom: 2px solid #ccc; padding-bottom: 10px;
+}
+.month-header-left { display: flex; align-items: baseline; gap: 15px; }
+.month-header-left h1 { font-size: 2.5rem; color: #111; font-weight: 900; text-transform: uppercase; }
+.month-header-left .year-badge { background: #e8f5e9; color: #2e7d32; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
+
+/* Layout หลัก */
+.scroll-wrapper { width: 100%; max-width: 1300px; flex-grow: 1; min-height: 0; }
+.layout-grid { display: flex; gap: 20px; width: 100%; height: 100%; }
+
+/* ตารางปฏิทิน (ด้านซ้าย) */
+.calendar-main { 
+    flex: 3; display: grid; 
+    grid-template-columns: repeat(7, 1fr); 
+    grid-template-rows: max-content; 
+    grid-auto-rows: minmax(0, 1fr); 
+    gap: 8px; height: 100%; min-height: 0; 
+}
+.day-name { font-weight: 900; text-align: center; color: #333; padding-bottom: 5px; font-size: 1rem; text-transform: uppercase; }
+
+/* ช่องวันที่ */
+.day-cell {
+    border-radius: 10px; background: #ffffff; padding: 6px; display: flex; flex-direction: column;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.1s;
+    overflow: hidden; 
+    min-height: 0; 
+}
+.day-cell:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 10; border: 1px solid #ddd; }
+.day-cell.empty { background: transparent; box-shadow: none; cursor: default; border: none;} 
+.day-cell.empty:hover { transform: none; box-shadow: none; }
+.date-num { font-weight: 800; margin-bottom: 4px; color: #666; font-size: 1rem; pointer-events: none;}
+.day-cell.has-event { background-color: #fdfdfd; }
+
+/* ป้ายกิจกรรมประเภทต่างๆ */
+.event { margin-bottom: 3px; padding: 4px 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; line-height: 1.15; word-break: break-word; pointer-events: none; }
+.event-holiday { background-color: #ffcdd2; color: #b71c1c; border-left: 3px solid #b71c1c; } 
+.event-anim { background-color: #e1bee7; color: #4a148c; border-left: 3px solid #8e24aa; }    
+.event-class { background-color: #bbdefb; color: #0d47a1; border-left: 3px solid #1e88e5; }   
+.event-project { background-color: #dcedc8; color: #33691e; border-left: 3px solid #7cb342; } 
+.event-party { background-color: #ffccbc; color: #bf360c; border-left: 3px solid #f4511e; }   
+
+/* แถบเมนูด้านขวา (Sidebar) */
+.sidebar { flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 5px; min-width: 250px; }
+.sidebar-box { background: #ffffff; border-radius: 15px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+.sidebar-box.green-box { background-color: #e8f5e9; }
+.sidebar-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase; }
+.sidebar-list { list-style-type: disc; padding-left: 20px; font-size: 0.85rem; color: #444; line-height: 1.6; }
+
+.sidebar-note-container { display: flex; flex-direction: column; gap: 5px; }
+.sidebar-note { padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
+.note-red { background-color: #ffebee; color: #c62828; border-left: 4px solid #ef5350; }
+.note-green { background-color: #e8f5e9; color: #2e7d32; border-left: 4px solid #66bb6a; }
+.note-orange { background-color: #fff8e1; color: #f57f17; border-left: 4px solid #fbc02d; }
+.note-subtext { font-size: 0.7rem; color: #888; margin-left: 5px; font-style: italic; }
+
+.legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.8rem; color: #555; font-weight: 600; }
+.color-box { width: 20px; height: 12px; border-radius: 4px; }
+.bg-green { background-color: #dcedc8; } .bg-blue { background-color: #bbdefb; }
+.bg-purple { background-color: #e1bee7; } .bg-red { background-color: #ffcdd2; }
+
+/* =========================================================
+   หน้าต่าง Popup (Modal)
+========================================================= */
+.modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+.modal.show { display: flex; animation: fadeIn 0.2s; }
+.modal-content { background: #fff; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; position: relative; }
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #888; }
+.modal-title { font-size: 1.5rem; color: #111; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-weight: 900; }
+.modal-body .event { font-size: 1rem; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+.no-event { color: #888; text-align: center; margin-top: 20px; font-size: 1rem; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+/* =========================================================
+   📱 โหมดแท็บเล็ต / iPad (Tablet Responsive)
+========================================================= */
+@media screen and (max-width: 1024px) {
+    .calendar-container { scroll-snap-type: none; overflow-x: hidden; }
+    .month-section { height: auto; min-height: 100vh; overflow: visible; padding-bottom: 40px; }
+    .layout-grid { flex-direction: column; }
+    
+    .calendar-main { height: 60vh; min-height: 500px; }
+    
+    .sidebar { flex-direction: row; flex-wrap: wrap; overflow: visible; padding-right: 0; }
+    .sidebar-box { flex: 1; min-width: 250px; }
+    .sidebar-note-container { width: 100%; }
+}
+
+/* =========================================================
+   📱 โหมดมือถือ (Mobile Responsive - ตาราง 7 วัน)
+========================================================= */
+@media screen and (max-width: 768px) {
+    .calendar-container { scroll-snap-type: none; overflow-x: hidden; }
+    /* เลิกบังคับความสูงหน้า ปล่อยให้เลื่อนลงไปดู Sidebar ด้านล่างได้ */
+    .month-section { height: auto; min-height: 100vh; overflow: visible; padding: 15px 5px; border-bottom: 8px solid #eee; }
+    
+    .layout-grid { flex-direction: column; min-width: 100%; gap: 10px; }
+    
+    /* คงตารางไว้ 7 วัน (Grid) แต่ย่อขนาดช่องไฟ */
+    .calendar-main { 
+        display: grid; 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 3px; /* ลดระยะห่างระหว่างช่อง */
+        height: auto; 
+        min-height: unset; 
+    }
+    
+    .day-name { font-size: 0.65rem; padding-bottom: 3px; }
+    
+    /* บังคับให้ช่องเป็นสี่เหลี่ยมเล็กๆ พอดีจอมือถือ */
+    .day-cell { 
+        height: 70px; /* ล็อคความสูงช่อง */
+        min-height: unset; 
+        padding: 2px; 
+        border-radius: 6px; 
+        overflow: hidden; /* งานล้นช่องให้ซ่อนไว้ เพื่อไปดูใน Popup */
+    }
+    
+    .date-num { font-size: 0.8rem; margin-bottom: 1px; text-align: center; }
+    
+    /* ย่อข้อความกิจกรรมให้จิ๋วลง ตัดคำด้วย ... */
+    .event { 
+        font-size: 0.5rem; 
+        padding: 1px 2px; 
+        border-left: 2px solid; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        margin-bottom: 1px; 
+    }
+    
+    .month-header-left h1 { font-size: 1.8rem; }
+    .month-header-left .year-badge { font-size: 0.9rem; padding: 2px 8px; }
+    
+    .sidebar { flex-direction: column; padding-bottom: 20px; gap: 10px; }
+    .sidebar-box { padding: 12px; }
+}
