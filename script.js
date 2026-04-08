@@ -86,7 +86,7 @@ for (let m = 0; m < 12; m++) {
     let noteClass = "";
     let taskNotesContent = ""; 
 
-    if (monthNum >= 3 && monthNum <= 4) {
+    if (monthNum >= 2 && monthNum <= 4) {
         noteContent = "🏖️ ช่วงปิดเทอมเเละช่วยงานที่บ้าน";
         noteClass = "note-red";
         taskNotesContent = `
