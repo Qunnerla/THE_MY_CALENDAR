@@ -103,6 +103,15 @@ for (let m = 0; m < 12; m++) {
             <li>แอนิเมชันลงกลุ่ม</li>
             <li>โปรเจกต์มหาลัย</li>
         `;
+                
+    } else if (monthNum === 5) {
+        noteContent = "📚 ช่วงทดลองงาน";
+        noteClass = "note-orange";
+        taskNotesContent = `
+            <li></li>
+            <li></li>
+            <li></li>
+        `;
     } else {
         noteContent = "📚 ช่วงเปิดเทอม";
         noteClass = "note-green";
