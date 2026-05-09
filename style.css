@@ -1,158 +1,824 @@
-/* ล้างค่าเริ่มต้น */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body, html { height: 100%; overflow: hidden; background-color: #1a1a1a; }
+/* ============================================================
+   Base & CSS Variables
+============================================================ */
+:root {
+    --sky-bg: #d4e9f7;
+    --sky-card: rgba(255, 255, 255, 0.88);
+    --white: #ffffff;
+    --primary: #6aace0;
+    --primary-dark: #4a8fd4;
+    --primary-light: #e0f0fb;
+    --text: #2c3e50;
+    --text-mid: #5a7a90;
+    --text-muted: #9ab0c0;
+    --border: rgba(130, 190, 235, 0.35);
+    --shadow-sm: 0 2px 12px rgba(80, 140, 200, 0.10);
+    --shadow-md: 0 6px 28px rgba(80, 140, 200, 0.16);
+    --shadow-lg: 0 16px 60px rgba(60, 120, 190, 0.22);
+    --radius: 18px;
+    --radius-sm: 10px;
+    --radius-pill: 50px;
+    --font: 'Sarabun', 'Segoe UI', Arial, sans-serif;
+}
 
-/* =========================================================
-   💻 โหมดคอมพิวเตอร์ (Desktop)
-========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font);
+    background: linear-gradient(160deg, #c8dff2 0%, #daedf8 45%, #cfe4f4 100%);
+    min-height: 100vh;
+    color: var(--text);
+}
+
+/* Decorative clouds */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+    z-index: 0;
+}
+body::before {
+    width: 500px; height: 200px;
+    bottom: 60px; left: -100px;
+    filter: blur(30px);
+}
+body::after {
+    width: 400px; height: 180px;
+    bottom: 20px; right: -80px;
+    filter: blur(25px);
+}
+
+/* ============================================================
+   Utility
+============================================================ */
+.hidden { display: none !important; }
+
+/* ============================================================
+   Top Navigation Bar
+============================================================ */
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 16px rgba(100, 160, 220, 0.10);
+}
+
+.top-bar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-icon { font-size: 1.5rem; }
+
+.brand-title {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 0.3px;
+}
+
+.top-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-badge {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 5px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.btn-nav {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    color: var(--text-mid);
+    padding: 7px 16px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: var(--font);
+    transition: all 0.18s;
+}
+.btn-nav:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+
+.btn-logout { background: #fff4f4; border-color: #ffd0d0; color: #e05555; }
+.btn-logout:hover { background: #ffe0e0; border-color: #e05555; }
+
+.btn-publish {
+    background: linear-gradient(135deg, #5bbf8a, #3aa870);
+    color: var(--white);
+    border: none;
+    padding: 7px 16px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 800;
+    font-family: var(--font);
+    transition: all 0.18s;
+    box-shadow: 0 2px 10px rgba(60, 168, 112, 0.28);
+}
+.btn-publish:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+/* ============================================================
+   Loading Screen
+============================================================ */
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+    color: var(--text-mid);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   Calendar Container
+============================================================ */
 .calendar-container {
-    height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth;
+    position: relative;
+    z-index: 1;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 28px 20px 70px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
 }
 
+/* ============================================================
+   Month Section Card
+============================================================ */
 .month-section {
-    height: 100vh; 
-    scroll-snap-align: start; display: flex; flex-direction: column;
-    align-items: center; padding: 2vh 20px; background-color: #f8f9fa;
-    overflow: hidden; 
+    background: var(--sky-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-/* ส่วนหัวปฏิทิน */
-.month-header { 
-    display: flex; justify-content: flex-start; align-items: center; 
-    margin-bottom: 1.5vh; width: 100%; max-width: 1300px; flex-shrink: 0;
-    border-bottom: 2px solid #ccc; padding-bottom: 10px;
+/* Month Header */
+.month-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(106, 172, 224, 0.06) 0%, transparent 100%);
 }
-.month-header-left { display: flex; align-items: baseline; gap: 15px; }
-.month-header-left h1 { font-size: 2.5rem; color: #111; font-weight: 900; text-transform: uppercase; }
-.month-header-left .year-badge { background: #e8f5e9; color: #2e7d32; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
 
-/* Layout หลัก */
-.scroll-wrapper { width: 100%; max-width: 1300px; flex-grow: 1; min-height: 0; }
-.layout-grid { display: flex; gap: 20px; width: 100%; height: 100%; }
-
-/* ตารางปฏิทิน (ด้านซ้าย) */
-.calendar-main { 
-    flex: 3; display: grid; 
-    grid-template-columns: repeat(7, 1fr); 
-    grid-template-rows: max-content; 
-    grid-auto-rows: minmax(0, 1fr); 
-    gap: 8px; height: 100%; min-height: 0; 
+.month-header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
 }
-.day-name { font-weight: 900; text-align: center; color: #333; padding-bottom: 5px; font-size: 1rem; text-transform: uppercase; }
 
-/* ช่องวันที่ */
+.month-name {
+    font-size: 1.9rem;
+    font-weight: 900;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.year-badge {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 3px 14px;
+    border-radius: var(--radius-pill);
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.period-badge {
+    padding: 5px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.period-red    { background: #ffebee; color: #c62828; }
+.period-green  { background: #e8f5e9; color: #2e7d32; }
+.period-orange { background: #fff8e1; color: #e65100; }
+
+/* Month Body Layout */
+.month-body {
+    display: flex;
+    align-items: flex-start;
+}
+
+/* ============================================================
+   Calendar Main Grid
+============================================================ */
+.calendar-main {
+    flex: 1;
+    padding: 16px 14px;
+    min-width: 0;
+}
+
+.day-names-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+}
+
+.day-name-cell {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 0;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+/* Day Cell */
 .day-cell {
-    border-radius: 10px; background: #ffffff; padding: 6px; display: flex; flex-direction: column;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.1s;
-    overflow: hidden; 
-    min-height: 0; 
-}
-.day-cell:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 10; border: 1px solid #ddd; }
-.day-cell.empty { background: transparent; box-shadow: none; cursor: default; border: none;} 
-.day-cell.empty:hover { transform: none; box-shadow: none; }
-.date-num { font-weight: 800; margin-bottom: 4px; color: #666; font-size: 1rem; pointer-events: none;}
-.day-cell.has-event { background-color: #fdfdfd; }
-
-/* ป้ายกิจกรรมประเภทต่างๆ */
-.event { margin-bottom: 3px; padding: 4px 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; line-height: 1.15; word-break: break-word; pointer-events: none; }
-.event-holiday { background-color: #ffcdd2; color: #b71c1c; border-left: 3px solid #b71c1c; } 
-.event-anim { background-color: #e1bee7; color: #4a148c; border-left: 3px solid #8e24aa; }    
-.event-class { background-color: #bbdefb; color: #0d47a1; border-left: 3px solid #1e88e5; }   
-.event-project { background-color: #dcedc8; color: #33691e; border-left: 3px solid #7cb342; } 
-.event-party { background-color: #ffccbc; color: #bf360c; border-left: 3px solid #f4511e; }   
-
-/* แถบเมนูด้านขวา (Sidebar) */
-.sidebar { flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 5px; min-width: 250px; }
-.sidebar-box { background: #ffffff; border-radius: 15px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-.sidebar-box.green-box { background-color: #e8f5e9; }
-.sidebar-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase; }
-.sidebar-list { list-style-type: disc; padding-left: 20px; font-size: 0.85rem; color: #444; line-height: 1.6; }
-
-.sidebar-note-container { display: flex; flex-direction: column; gap: 5px; }
-.sidebar-note { padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
-.note-red { background-color: #ffebee; color: #c62828; border-left: 4px solid #ef5350; }
-.note-green { background-color: #e8f5e9; color: #2e7d32; border-left: 4px solid #66bb6a; }
-.note-orange { background-color: #fff8e1; color: #f57f17; border-left: 4px solid #fbc02d; }
-.note-subtext { font-size: 0.7rem; color: #888; margin-left: 5px; font-style: italic; }
-
-.legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.8rem; color: #555; font-weight: 600; }
-.color-box { width: 20px; height: 12px; border-radius: 4px; }
-.bg-green { background-color: #dcedc8; } .bg-blue { background-color: #bbdefb; }
-.bg-purple { background-color: #e1bee7; } .bg-red { background-color: #ffcdd2; }
-
-/* =========================================================
-   หน้าต่าง Popup (Modal)
-========================================================= */
-.modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-.modal.show { display: flex; animation: fadeIn 0.2s; }
-.modal-content { background: #fff; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; position: relative; }
-.close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #888; }
-.modal-title { font-size: 1.5rem; color: #111; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-weight: 900; }
-.modal-body .event { font-size: 1rem; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
-.no-event { color: #888; text-align: center; margin-top: 20px; font-size: 1rem; }
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-/* =========================================================
-   📱 โหมดแท็บเล็ต / iPad (Tablet Responsive)
-========================================================= */
-@media screen and (max-width: 1024px) {
-    .calendar-container { scroll-snap-type: none; overflow-x: hidden; }
-    .month-section { height: auto; min-height: 100vh; overflow: visible; padding-bottom: 40px; }
-    .layout-grid { flex-direction: column; }
-    
-    .calendar-main { height: 60vh; min-height: 500px; }
-    
-    .sidebar { flex-direction: row; flex-wrap: wrap; overflow: visible; padding-right: 0; }
-    .sidebar-box { flex: 1; min-width: 250px; }
-    .sidebar-note-container { width: 100%; }
+    background: rgba(255, 255, 255, 0.70);
+    border-radius: var(--radius-sm);
+    padding: 6px 5px;
+    min-height: 78px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    position: relative;
 }
 
-/* =========================================================
-   📱 โหมดมือถือ (Mobile Responsive - ตาราง 7 วัน)
-========================================================= */
-@media screen and (max-width: 768px) {
-    .calendar-container { scroll-snap-type: none; overflow-x: hidden; }
-    /* เลิกบังคับความสูงหน้า ปล่อยให้เลื่อนลงไปดู Sidebar ด้านล่างได้ */
-    .month-section { height: auto; min-height: 100vh; overflow: visible; padding: 15px 5px; border-bottom: 8px solid #eee; }
-    
-    .layout-grid { flex-direction: column; min-width: 100%; gap: 10px; }
-    
-    /* คงตารางไว้ 7 วัน (Grid) แต่ย่อขนาดช่องไฟ */
-    .calendar-main { 
-        display: grid; 
-        grid-template-columns: repeat(7, 1fr); 
-        gap: 3px; /* ลดระยะห่างระหว่างช่อง */
-        height: auto; 
-        min-height: unset; 
+.day-cell:hover {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 3px 14px rgba(100, 160, 220, 0.18);
+    transform: translateY(-1px);
+    z-index: 2;
+}
+
+.day-cell.empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+.day-cell.today {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.day-cell.is-sunday  .date-number { color: #e53e3e; }
+.day-cell.is-saturday .date-number { color: var(--primary-dark); }
+
+.date-number {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-mid);
+    line-height: 1;
+}
+
+.day-cell.today .date-number {
+    color: var(--primary-dark);
+}
+
+/* ============================================================
+   Event Badges (inside calendar cells)
+============================================================ */
+.event-badge {
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.58rem;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 2.5px solid;
+}
+
+.event-badge.type-holiday { background: #fff0f0; color: #9b1c1c; border-color: #e53e3e; }
+.event-badge.type-anim    { background: #f5f0ff; color: #5b21b6; border-color: #8b5cf6; }
+.event-badge.type-class   { background: #eff6ff; color: #1e3a8a; border-color: #3b82f6; }
+.event-badge.type-project { background: #f0fdf4; color: #14532d; border-color: #22c55e; }
+.event-badge.type-party   { background: #fff7ed; color: #9a3412; border-color: #f97316; }
+
+.more-events-label {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    padding: 1px 4px;
+}
+
+/* ============================================================
+   Sidebar
+============================================================ */
+.month-sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(235, 247, 255, 0.45);
+}
+
+.sidebar-card {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 13px;
+    border: 1px solid var(--border);
+}
+
+.sidebar-card-title {
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+/* Legend */
+.legend-list { display: flex; flex-direction: column; gap: 7px; }
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    font-weight: 600;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+/* Task notes */
+.task-note-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    line-height: 1.55;
+    margin-bottom: 6px;
+}
+
+.task-note-time {
+    font-weight: 900;
+    color: var(--primary-dark);
+    white-space: nowrap;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Overlay Modals
+============================================================ */
+.overlay-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(60, 110, 160, 0.38);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadein 0.2s ease;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 30px 26px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    animation: slideup 0.24s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes slideup {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: #f0f5fb;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background 0.15s;
+}
+.modal-close:hover { background: #ffe0e0; color: #e53e3e; }
+
+/* ============================================================
+   Login Card
+============================================================ */
+.login-card { text-align: center; }
+.login-icon { font-size: 2.6rem; margin-bottom: 12px; }
+.login-card h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+
+.muted-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.help-text {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-top: 10px;
+    margin-bottom: 14px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.error-msg {
+    color: #e53e3e;
+    font-size: 0.8rem;
+    margin-top: -6px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.pw-input {
+    width: 100%;
+    background: #f4f9fe;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 11px 18px;
+    margin-bottom: 12px;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+}
+.pw-input:focus { border-color: var(--primary); }
+
+/* ============================================================
+   Day Detail Card
+============================================================ */
+.day-card { max-width: 440px; }
+
+.day-modal-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    margin-bottom: 16px;
+    padding-right: 32px;
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.day-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.day-event-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid;
+}
+
+.day-event-row.type-holiday { background: #fff5f5; border-color: #e53e3e; }
+.day-event-row.type-anim    { background: #f6f0ff; border-color: #8b5cf6; }
+.day-event-row.type-class   { background: #eff6ff; border-color: #3b82f6; }
+.day-event-row.type-project { background: #f0fdf4; border-color: #22c55e; }
+.day-event-row.type-party   { background: #fff8f0; border-color: #f97316; }
+
+.day-event-body { flex: 1; min-width: 0; }
+
+.day-event-text {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+}
+
+.day-event-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.day-event-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 3px 5px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    line-height: 1;
+}
+.icon-btn:hover { background: rgba(0,0,0,0.07); }
+
+.no-event-msg {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 22px 0;
+}
+
+.class-tag {
+    font-size: 0.7rem;
+    background: #eff6ff;
+    color: #1e3a8a;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Add/Edit Card
+============================================================ */
+.edit-card { max-width: 420px; }
+.edit-card h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 16px; padding-right: 32px; }
+
+.priority-group {
+    display: flex;
+    background: #f0f5fb;
+    border-radius: var(--radius-pill);
+    padding: 4px;
+    margin-bottom: 14px;
+    gap: 3px;
+}
+
+.priority-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 7px 10px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 800;
+    font-family: var(--font);
+    color: var(--text-muted);
+    transition: all 0.15s;
+}
+.priority-btn.active {
+    background: var(--white);
+    color: var(--text);
+    box-shadow: 0 1px 6px rgba(100, 140, 190, 0.15);
+}
+
+/* Input fields */
+.input-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f4f9fe;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 10px 16px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+}
+.input-field:focus-within { border-color: var(--primary); }
+
+.field-icon { font-size: 1rem; flex-shrink: 0; }
+
+.field-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    color: var(--text);
+    min-width: 0;
+}
+.field-input::placeholder { color: var(--text-muted); }
+
+.field-select { cursor: pointer; }
+
+.time-mode-toggle {
+    display: flex;
+    background: #f0f5fb;
+    border-radius: var(--radius-pill);
+    padding: 4px;
+    margin-bottom: 10px;
+    gap: 3px;
+}
+
+.time-mode-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 7px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 800;
+    font-family: var(--font);
+    color: var(--text-muted);
+    transition: all 0.15s;
+}
+.time-mode-btn.active {
+    background: var(--white);
+    color: var(--text);
+    box-shadow: 0 1px 6px rgba(100, 140, 190, 0.15);
+}
+
+.time-sep { color: var(--text-muted); font-weight: 800; }
+.time-field { text-align: center; }
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #6aace0, #4a8fd4);
+    color: var(--white);
+    border: none;
+    padding: 13px 24px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 900;
+    font-family: var(--font);
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    display: block;
+}
+.btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 5px 18px rgba(74, 143, 212, 0.32); }
+
+.btn-secondary {
+    background: var(--white);
+    color: var(--text-mid);
+    border: 1.5px solid var(--border);
+    padding: 12px 24px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: var(--font);
+    transition: all 0.15s;
+    display: block;
+}
+.btn-secondary:hover { background: #f4f9fe; }
+
+.btn-full { width: 100%; margin-top: 8px; }
+
+.btn-add-event {
+    width: 100%;
+    background: var(--primary-light);
+    border: 2px dashed var(--primary);
+    color: var(--primary-dark);
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 800;
+    font-family: var(--font);
+    transition: all 0.15s;
+    margin-top: 4px;
+}
+.btn-add-event:hover { background: var(--primary); color: var(--white); }
+
+/* ============================================================
+   Responsive — Tablet (≤ 1024px)
+============================================================ */
+@media (max-width: 1024px) {
+    .month-sidebar { width: 200px; }
+    .month-name { font-size: 1.55rem; }
+}
+
+/* ============================================================
+   Responsive — Mobile (≤ 768px)
+============================================================ */
+@media (max-width: 768px) {
+    .calendar-container { padding: 14px 10px 50px; gap: 20px; }
+
+    .month-body { flex-direction: column; }
+
+    .month-sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px;
     }
-    
-    .day-name { font-size: 0.65rem; padding-bottom: 3px; }
-    
-    /* บังคับให้ช่องเป็นสี่เหลี่ยมเล็กๆ พอดีจอมือถือ */
-    .day-cell { 
-        height: 70px; /* ล็อคความสูงช่อง */
-        min-height: unset; 
-        padding: 2px; 
-        border-radius: 6px; 
-        overflow: hidden; /* งานล้นช่องให้ซ่อนไว้ เพื่อไปดูใน Popup */
+    .sidebar-card { flex: 1; min-width: 190px; }
+
+    .month-name { font-size: 1.35rem; }
+    .calendar-main { padding: 10px 8px; }
+
+    .day-cell { min-height: 58px; padding: 4px 3px; }
+    .date-number { font-size: 0.78rem; }
+    .event-badge { font-size: 0.52rem; padding: 1px 3px; }
+    .days-grid { gap: 3px; }
+}
+
+/* ============================================================
+   Responsive — Small Mobile (≤ 480px)
+============================================================ */
+@media (max-width: 480px) {
+    .top-bar { padding: 10px 12px; }
+    .brand-title { font-size: 0.95rem; }
+    .btn-nav { padding: 6px 12px; font-size: 0.75rem; }
+    .btn-publish { padding: 6px 11px; font-size: 0.75rem; }
+    .admin-badge { padding: 4px 10px; font-size: 0.75rem; }
+
+    .day-cell { min-height: 48px; }
+    .event-badge:not(:first-child) { display: none; }
+    .more-events-label { display: none; }
+    .month-name { font-size: 1.2rem; }
+}
+
+/* ============================================================
+   Responsive — Tiny (≤ 360px)
+============================================================ */
+@media (max-width: 360px) {
+    .event-badge { display: none; }
+    .day-cell.has-event::after {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--primary);
+        margin: 2px auto 0;
     }
-    
-    .date-num { font-size: 0.8rem; margin-bottom: 1px; text-align: center; }
-    
-    /* ย่อข้อความกิจกรรมให้จิ๋วลง ตัดคำด้วย ... */
-    .event { 
-        font-size: 0.5rem; 
-        padding: 1px 2px; 
-        border-left: 2px solid; 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
-        margin-bottom: 1px; 
-    }
-    
-    .month-header-left h1 { font-size: 1.8rem; }
-    .month-header-left .year-badge { font-size: 0.9rem; padding: 2px 8px; }
-    
-    .sidebar { flex-direction: column; padding-bottom: 20px; gap: 10px; }
-    .sidebar-box { padding: 12px; }
 }

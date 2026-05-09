@@ -4,21 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Schedule 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="calendar-container" id="calendar-container">
-        </div>
-
-    <div id="event-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="close-modal">&times;</span>
-            <h2 id="modal-date" class="modal-title">วันที่</h2>
-            <div id="modal-events" class="modal-body"></div>
+    <!-- ===== Admin Login Modal ===== -->
+    <div id="login-modal" class="overlay-modal hidden">
+        <div class="modal-card login-card">
+            <button class="modal-close" id="close-login-btn">×</button>
+            <div class="login-icon">🔐</div>
+            <h2>เข้าสู่ระบบแอดมิน</h2>
+            <p class="muted-text">กรอกรหัสผ่านเพื่อแก้ไขปฏิทิน</p>
+            <input type="password" id="admin-pw-input" class="pw-input" placeholder="รหัสผ่าน" autocomplete="current-password" />
+            <p id="login-error-msg" class="error-msg hidden">รหัสผ่านไม่ถูกต้อง</p>
+            <button id="do-login-btn" class="btn-primary btn-full">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <!-- ===== GitHub Token Setup Modal ===== -->
+    <div id="token-modal" class="overlay-modal hidden">
+        <div class="modal-card">
+            <button class="modal-close" id="close-token-btn">×</button>
+            <div class="login-icon">🔑</div>
+            <h2>ตั้งค่า GitHub Token</h2>
+            <p class="muted-text">ใช้ครั้งแรกครั้งเดียว เพื่อเผยแพร่ข้อมูลให้ทุกคนเห็น</p>
+            <input type="text" id="github-token-input" class="pw-input" placeholder="GitHub Personal Access Token" />
+            <p class="help-text">สร้าง token ที่ GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens (สิทธิ์: Contents: Read and Write)</p>
+            <button id="save-token-btn" class="btn-primary btn-full">บันทึก Token</button>
+        </div>
+    </div>
+
+    <!-- ===== Day Detail Modal ===== -->
+    <div id="day-modal" class="overlay-modal hidden">
+        <div class="modal-card day-card">
+            <button class="modal-close" id="close-day-btn">×</button>
+            <h2 id="day-modal-date" class="day-modal-title"></h2>
+            <div id="day-modal-events" class="day-events-list"></div>
+            <button id="add-on-day-btn" class="btn-add-event hidden">+ เพิ่มรายการในวันนี้</button>
+        </div>
+    </div>
+
+    <!-- ===== Add / Edit Event Modal ===== -->
+    <div id="edit-modal" class="overlay-modal hidden">
+        <div class="modal-card edit-card">
+            <button class="modal-close" id="close-edit-btn">×</button>
+            <h2 id="edit-modal-title">เพิ่มรายการ</h2>
+
+            <div class="priority-group">
+                <button class="priority-btn active" data-val="normal">ปกติ</button>
+                <button class="priority-btn" data-val="important">สำคัญ ⭐</button>
+            </div>
+
+            <div class="input-field">
+                <span class="field-icon">📅</span>
+                <input type="date" id="edit-date-input" class="field-input" />
+            </div>
+
+            <div class="input-field">
+                <span class="field-icon">📄</span>
+                <input type="text" id="edit-name-input" class="field-input" placeholder="ชื่อรายการ" />
+            </div>
+
+            <div class="input-field">
+                <span class="field-icon">📁</span>
+                <select id="edit-type-input" class="field-input field-select">
+                    <option value="holiday">วันหยุด / วันสำคัญ</option>
+                    <option value="anim">งานแอนิเมชัน</option>
+                    <option value="class">ตารางเรียน</option>
+                    <option value="project">โปรเจกต์ / มหาลัย</option>
+                    <option value="party">กิจกรรม / ปาร์ตี้</option>
+                </select>
+            </div>
+
+            <div class="time-mode-toggle">
+                <button class="time-mode-btn" id="btn-allday">ทั้งวัน</button>
+                <button class="time-mode-btn active" id="btn-timerange">ช่วงเวลา</button>
+            </div>
+
+            <div id="time-inputs-row" class="input-field">
+                <span class="field-icon">⏰</span>
+                <input type="time" id="edit-start-time" class="field-input time-field" value="09:00" />
+                <span class="time-sep">—</span>
+                <input type="time" id="edit-end-time" class="field-input time-field" value="10:00" />
+            </div>
+
+            <div class="input-field">
+                <span class="field-icon">📍</span>
+                <input type="text" id="edit-location-input" class="field-input" placeholder="สถานที่ (ไม่บังคับ)" />
+            </div>
+
+            <button id="save-edit-btn" class="btn-primary btn-full">บันทึกรายการ</button>
+            <button id="cancel-edit-btn" class="btn-secondary btn-full">ยกเลิก</button>
+        </div>
+    </div>
+
+    <!-- ===== Top Navigation ===== -->
+    <nav class="top-bar">
+        <div class="top-bar-brand">
+            <span class="brand-icon">📅</span>
+            <span class="brand-title">My Schedule 2026</span>
+        </div>
+        <div class="top-bar-actions">
+            <span id="admin-badge" class="admin-badge hidden">⚙️ แอดมิน</span>
+            <button id="publish-btn" class="btn-publish hidden" title="เผยแพร่ให้ทุกคนเห็น">🌐 เผยแพร่</button>
+            <button id="login-nav-btn" class="btn-nav">🔐 แอดมิน</button>
+            <button id="logout-nav-btn" class="btn-nav btn-logout hidden">ออกจากระบบ</button>
+        </div>
+    </nav>
+
+    <!-- ===== Loading State ===== -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>กำลังโหลดปฏิทิน…</p>
+    </div>
+
+    <!-- ===== Calendar ===== -->
+    <main class="calendar-container" id="calendar-container" style="display:none;"></main>
+
+    <script src="script.js"></script>
 </body>
 </html>
